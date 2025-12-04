@@ -205,3 +205,59 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ==========================================
+# PROYECTO ML - REGLAS ESPECÍFICAS ADICIONALES
+# ==========================================
+
+# Datos locales (no subir datasets al repo)
+data/raw/
+data/interim/
+data/processed/
+data/forecasts/
+
+# Modelos entrenados
+models/
+*.pkl
+*.joblib
+*.sav
+
+# Logs
+logs/
+*.log
+
+# Streamlit cache
+.streamlit/
+**/.streamlit/
+
+# Docker
+docker_out/
+*.tar
+*.img
+
+# Archivos de compilación temporal
+*.cache
+*.tmp
+
+# Carpetas creadas por pruebas y artefactos
+test_outputs/
+outputs/
+
+# Archivos de configuración sensibles
+*.env
+*.env.*
+.env_local
+
+# Archivos del entorno de virtualización
+venv/
+ENV/
+env/
+.venv/
+
+# Reportes de experimentos (por si luego usas MLflow)
+mlruns/
+mlartifacts/
+
+# Configuración de Jupyter
+.ipynb_checkpoints/
+jupyter_cache/

@@ -1,0 +1,34 @@
+# ===== Core =====
+numpy>=1.22
+pandas>=1.5.0
+scikit-learn>=1.0
+
+# ===== Time Series =====
+statsmodels<=0.14
+pmdarima
+prophet<=1.1.5
+
+# ===== Machine Learning =====
+xgboost>=1.7
+lightgbm
+catboost
+
+# ===== Visualization =====
+matplotlib>=3.5
+seaborn>=0.12
+plotly
+
+# ===== Utilities =====
+python-dotenv>=1.0
+pyyaml
+joblib
+
+# ===== App =====
+streamlit
+
+# ===== Notebooks =====
+jupyterlab>=3.0
+ipywidgets>=8.0
+
+
+#-e .
