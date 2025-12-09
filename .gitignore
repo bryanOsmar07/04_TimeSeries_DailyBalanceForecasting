@@ -316,3 +316,5 @@ venv/
 .venv/
 env/
 ENV/
+
+catboost_info/

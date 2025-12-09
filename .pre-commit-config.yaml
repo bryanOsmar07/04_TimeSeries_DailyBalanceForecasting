@@ -1,0 +1,23 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: black (formateo)
+        entry: black
+        language: system
+        types: [python]
+        args: ["--line-length=88"]  # ajusta si usas otro
+
+      - id: isort
+        name: isort (orden de imports)
+        entry: isort
+        language: system
+        types: [python]
+        args: ["--profile", "black"]
+
+      - id: flake8
+        name: flake8 (linting)
+        entry: flake8
+        language: system
+        types: [python]
+        # si tienes config en pyproject.toml/flake8, la respeta igual

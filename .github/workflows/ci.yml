@@ -30,10 +30,10 @@ jobs:
           pip install -e .
 
       - name: Lint with isort
-        run: isort . --check-only
+        run: isort . --check-only --profile black
 
       - name: Lint with black
-        run: black . --check
+        run: black . --check --diff --color
 
       - name: Lint with flake8
         run: flake8 .
