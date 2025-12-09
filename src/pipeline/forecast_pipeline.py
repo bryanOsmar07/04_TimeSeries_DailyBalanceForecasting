@@ -1,19 +1,22 @@
+import json
 import os
 import sys
-import json
 from typing import List
 
 import joblib
 import pandas as pd
 
+from src.components.data_transformation import build_features_from_saldo
 from src.exception import CustomException
 from src.logger import logging
-from src.components.data_transformation import build_features_from_saldo
-
 
 # Rutas “fijas” de artefactos (las mismas que vienes usando)
 RAW_PATH = os.path.join("artifacts", "data_ingestion", "raw.csv")
-FEATURE_COLS_PATH = os.path.join("artifacts", "data_transformation", "feature_cols.json")
+FEATURE_COLS_PATH = os.path.join(
+    "artifacts",
+    "data_transformation",
+    "feature_cols.json",
+)
 MODEL_PATH = os.path.join("artifacts", "model_trainer", "catboost_saldo_model.pkl")
 FORECAST_DIR = os.path.join("artifacts", "forecast")
 
@@ -80,13 +83,15 @@ def run_forecast_pipeline(n_days: int = 15) -> str:
         # 1) Cargar histórico raw.csv
         # ============================
         if not os.path.exists(RAW_PATH):
-            raise FileNotFoundError(
-                f"No se encontró el raw data en {RAW_PATH}. Ejecuta primero el training_pipeline."
+            msg = (
+                f"No se encontró el raw data en {RAW_PATH}. "
+                "Ejecuta primero el training_pipeline."
             )
+            raise FileNotFoundError(msg)
 
         df_raw = pd.read_csv(RAW_PATH)
         if "load_date" not in df_raw.columns or "saldo" not in df_raw.columns:
-            raise ValueError("raw.csv debe contener las columnas 'load_date' y 'saldo'.")
+            raise ValueError("raw.csv debe contener 'load_date' y 'saldo'.")
 
         df_raw["load_date"] = pd.to_datetime(df_raw["load_date"])
         df_raw = df_raw.sort_values("load_date").reset_index(drop=True)
@@ -103,7 +108,7 @@ def run_forecast_pipeline(n_days: int = 15) -> str:
 
             if not isinstance(feature_cols, list):
                 raise ValueError(
-                    f"El contenido de {FEATURE_COLS_PATH} debe ser una lista de nombres de columnas."
+                    f"El contenido de {FEATURE_COLS_PATH} debe ser lista de nombres."
                 )
             logging.info(
                 "feature_cols cargado desde %s con %d columnas.",
@@ -141,7 +146,7 @@ def run_forecast_pipeline(n_days: int = 15) -> str:
         # ============================
         if not os.path.exists(MODEL_PATH):
             raise FileNotFoundError(
-                f"No se encontró el modelo en {MODEL_PATH}. Ejecuta primero el training_pipeline."
+                f"No se encontró el modelo en {MODEL_PATH}."
             )
 
         model = joblib.load(MODEL_PATH)

@@ -3,13 +3,17 @@
 import os
 import sys
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional
 
 import joblib
 import numpy as np
 import pandas as pd
 from catboost import CatBoostRegressor
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, root_mean_squared_error
+from sklearn.metrics import (
+    mean_absolute_error,
+    r2_score,
+    root_mean_squared_error,
+)
 
 from src.exception import CustomException
 from src.logger import logging
@@ -40,7 +44,7 @@ def _compute_metrics(
     Calcula métricas de regresión básicas.
     """
     mae = mean_absolute_error(y_true, y_pred)
-    #rmse = mean_squared_error(y_true, y_pred, squared=False)
+    # rmse = mean_squared_error(y_true, y_pred, squared=False)
     rmse = root_mean_squared_error(y_true, y_pred)
 
     # Evitamos divisiones por cero en MAPE
@@ -57,8 +61,12 @@ def _compute_metrics(
 
 
 class ModelTrainer:
-    def __init__(self):
-        self.config = ModelTrainerConfig()
+    def __init__(self, config: Optional[ModelTrainerConfig] = None) -> None:
+        """
+        Si no se pasa config, usa la configuración por defecto.
+        Esto permite que los tests usen rutas temporales sin pisar artifacts reales.
+        """
+        self.config = config or ModelTrainerConfig()
 
     def _build_model(self) -> CatBoostRegressor:
         """

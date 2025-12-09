@@ -8,18 +8,40 @@ target-version = ["py310"]
 exclude = '''
 (
   /venv
+  | /.venv
   | /artifacts
+  | /data
   | /notebooks
   | /__pycache__
+  | /mlruns
+  | /.streamlit
 )
 '''
 
 [tool.isort]
 profile = "black"
 line_length = 88
-skip = ["venv", "artifacts", "notebooks", "__pycache__"]
+skip = [
+  "venv",
+  ".venv",
+  "artifacts",
+  "data",
+  "notebooks",
+  "__pycache__",
+  "mlruns",
+  ".streamlit",
+]
 
 [tool.flake8]
 max-line-length = 88
 extend-ignore = ["E203", "W503"]
-exclude = ["venv", "artifacts", "notebooks", "__pycache__"]
+exclude = [
+  "venv",
+  ".venv",
+  "artifacts",
+  "data",
+  "notebooks",
+  "__pycache__",
+  "mlruns",
+  ".streamlit",
+]

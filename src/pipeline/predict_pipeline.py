@@ -1,18 +1,17 @@
 # src/pipeline/predict_pipeline.py
 
+import json
 import os
 import sys
-import json
 from dataclasses import dataclass
 from typing import Optional
 
-import numpy as np
-import pandas as pd
 import joblib
+import pandas as pd
 
+from src.components.data_transformation import build_features_from_saldo
 from src.exception import CustomException
 from src.logger import logging
-from src.components.data_transformation import build_features_from_saldo
 
 
 @dataclass
@@ -48,8 +47,15 @@ class PredictPipeline:
             logging.info("Cargando modelo desde %s", self.config.model_path)
             self.model = joblib.load(self.config.model_path)
 
-            logging.info("Cargando feature_cols desde %s", self.config.feature_cols_path)
-            with open(self.config.feature_cols_path, "r", encoding="utf-8") as f:
+            logging.info(
+                "Cargando feature_cols desde %s",
+                self.config.feature_cols_path,
+            )
+            with open(
+                self.config.feature_cols_path,
+                "r",
+                encoding="utf-8",
+            ) as f:
                 self.feature_cols = json.load(f)
 
         except Exception as e:
@@ -147,7 +153,7 @@ class PredictPipeline:
         ----------
         raw_data_path : ruta opcional al CSV con columnas ['load_date', 'saldo'].
                         Si es None, usa self.config.raw_data_path.
-        n_days        : horizonte de forecast. Si es None, usa self.config.forecast_days.
+        n_days: horizonte de forecast. Si es None, usa self.config.forecast_days.
         save_to_disk  : si True, guarda el resultado en forecast_output_path
 
         Returns
@@ -169,8 +175,13 @@ class PredictPipeline:
             )
 
             if save_to_disk:
-                os.makedirs(os.path.dirname(self.config.forecast_output_path), exist_ok=True)
+                os.makedirs(
+                    os.path.dirname(self.config.forecast_output_path),
+                    exist_ok=True,
+                )
+
                 df_forecast.to_csv(self.config.forecast_output_path, index=False)
+
                 logging.info(
                     "Forecast guardado en: %s",
                     self.config.forecast_output_path,

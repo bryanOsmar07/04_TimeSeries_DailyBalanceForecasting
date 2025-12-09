@@ -4,11 +4,12 @@ import os
 import sys
 from dataclasses import dataclass
 
-import numpy as np
 import pandas as pd
+import json
 
 from src.exception import CustomException
 from src.logger import logging
+from typing import Optional
 
 
 @dataclass
@@ -37,7 +38,7 @@ class DataTransformationConfig:
     )
 
     feature_cols_path: str = os.path.join(
-        transformed_dir, "feature_cols.txt"
+        transformed_dir, "feature_cols.json"
     )
 
 
@@ -74,24 +75,24 @@ def build_features_from_saldo(df_raw: pd.DataFrame) -> pd.DataFrame:
     df_cf = df_cf.set_index("load_date")
 
     # Calendario
-    df_cf["year"]         = df_cf.index.year
-    df_cf["month"]        = df_cf.index.month
+    df_cf["year"] = df_cf.index.year
+    df_cf["month"] = df_cf.index.month
     df_cf["day_of_month"] = df_cf.index.day
-    df_cf["day_of_year"]  = df_cf.index.dayofyear
-    df_cf["dow"]          = df_cf.index.dayofweek
+    df_cf["day_of_year"] = df_cf.index.dayofyear
+    df_cf["dow"] = df_cf.index.dayofweek
 
-    df_cf["is_weekend"]     = (df_cf["dow"] >= 5).astype(int)
+    df_cf["is_weekend"] = (df_cf["dow"] >= 5).astype(int)
     df_cf["is_month_start"] = df_cf.index.is_month_start.astype(int)
-    df_cf["is_month_end"]   = df_cf.index.is_month_end.astype(int)
+    df_cf["is_month_end"] = df_cf.index.is_month_end.astype(int)
 
     # Paydays (versión notebook)
-    df_cf["is_payday"]      = df_cf["day_of_month"].isin([15, 30, 31]).astype(int)
-    df_cf["is_pre_payday"]  = df_cf["day_of_month"].isin([14, 29, 30]).astype(int)
+    df_cf["is_payday"] = df_cf["day_of_month"].isin([15, 30, 31]).astype(int)
+    df_cf["is_pre_payday"] = df_cf["day_of_month"].isin([14, 29, 30]).astype(int)
     df_cf["is_post_payday"] = df_cf["day_of_month"].isin([1, 16]).astype(int)
 
     # Bonos por mes (sin día)
-    df_cf["is_cts"]        = df_cf["month"].isin([5, 11]).astype(int)
-    df_cf["is_grati"]      = df_cf["month"].isin([7, 12]).astype(int)
+    df_cf["is_cts"] = df_cf["month"].isin([5, 11]).astype(int)
+    df_cf["is_grati"] = df_cf["month"].isin([7, 12]).astype(int)
     df_cf["is_utilidades"] = df_cf["month"].isin([3, 4]).astype(int)
 
     # Feriados fijos (versión notebook)
@@ -109,12 +110,12 @@ def build_features_from_saldo(df_raw: pd.DataFrame) -> pd.DataFrame:
     # Rolling SIN leakage (usando saldo.shift(1))
     for w in [3, 7, 14, 30]:
         df_cf[f"rolling_mean_{w}"] = df_cf["saldo"].shift(1).rolling(w).mean()
-        df_cf[f"rolling_std_{w}"]  = df_cf["saldo"].shift(1).rolling(w).std()
+        df_cf[f"rolling_std_{w}"] = df_cf["saldo"].shift(1).rolling(w).std()
 
     # Dif y pct_change SIN leakage
-    df_cf["diff_1"]       = df_cf["saldo"].diff(1).shift(1)
+    df_cf["diff_1"] = df_cf["saldo"].diff(1).shift(1)
     df_cf["pct_change_1"] = df_cf["saldo"].pct_change(1).shift(1)
-    df_cf["diff_7"]       = df_cf["saldo"].diff(7).shift(1)
+    df_cf["diff_7"] = df_cf["saldo"].diff(7).shift(1)
 
     # Target saldo t+1
     df_cf["target_saldo_tplus1"] = df_cf["saldo"].shift(-1)
@@ -136,12 +137,12 @@ def build_features_from_saldo(df_raw: pd.DataFrame) -> pd.DataFrame:
         df_diff[f"diff_lag{lag}"] = df_diff["diff"].shift(lag)
 
     # Rolling de diff (sin shift en notebook)
-    df_diff["diff_roll_mean_3"]  = df_diff["diff"].rolling(3).mean()
-    df_diff["diff_roll_std_3"]   = df_diff["diff"].rolling(3).std()
-    df_diff["diff_roll_mean_7"]  = df_diff["diff"].rolling(7).mean()
-    df_diff["diff_roll_std_7"]   = df_diff["diff"].rolling(7).std()
+    df_diff["diff_roll_mean_3"] = df_diff["diff"].rolling(3).mean()
+    df_diff["diff_roll_std_3"] = df_diff["diff"].rolling(3).std()
+    df_diff["diff_roll_mean_7"] = df_diff["diff"].rolling(7).mean()
+    df_diff["diff_roll_std_7"] = df_diff["diff"].rolling(7).std()
     df_diff["diff_roll_mean_14"] = df_diff["diff"].rolling(14).mean()
-    df_diff["diff_roll_std_14"]  = df_diff["diff"].rolling(14).std()
+    df_diff["diff_roll_std_14"] = df_diff["diff"].rolling(14).std()
 
     df_diff = df_diff.dropna().copy()
 
@@ -162,7 +163,7 @@ def build_features_from_saldo(df_raw: pd.DataFrame) -> pd.DataFrame:
         (df_tuning["dow"] < 5) & (df_tuning["is_holiday"] == 0)
     ).astype(int)
 
-    df_tuning["is_zero_expected"]    = (df_tuning["is_business_day"] == 0).astype(int)
+    df_tuning["is_zero_expected"] = (df_tuning["is_business_day"] == 0).astype(int)
     df_tuning["lag_is_zero_expected"] = df_tuning["is_zero_expected"].shift(1)
 
     # 3.2 Ciclo mensual (versión notebook)
@@ -170,21 +171,21 @@ def build_features_from_saldo(df_raw: pd.DataFrame) -> pd.DataFrame:
         df_tuning["day_of_month"] / df_tuning["day_of_month"].max()
     )
     df_tuning["is_first_week"] = (df_tuning["day_of_month"] <= 7).astype(int)
-    df_tuning["is_last_week"]  = (df_tuning["day_of_month"] >= 24).astype(int)
+    df_tuning["is_last_week"] = (df_tuning["day_of_month"] >= 24).astype(int)
 
     # 3.3 Dif suavizada
     df_tuning["diff_smooth_3"] = df_tuning["diff"].rolling(3).mean().shift(1)
     df_tuning["diff_smooth_7"] = df_tuning["diff"].rolling(7).mean().shift(1)
 
-    q1  = df_tuning["diff"].quantile(0.01)
+    q1 = df_tuning["diff"].quantile(0.01)
     q99 = df_tuning["diff"].quantile(0.99)
     df_tuning["diff_winsor"] = df_tuning["diff"].clip(q1, q99)
 
     # 3.4 Tendencias
-    df_tuning["saldo_trend_7"]  = df_tuning["saldo"].diff(7).shift(1)
+    df_tuning["saldo_trend_7"] = df_tuning["saldo"].diff(7).shift(1)
     df_tuning["saldo_trend_30"] = df_tuning["saldo"].diff(30).shift(1)
 
-    df_tuning["saldo_ema_7"]  = df_tuning["saldo"].ewm(span=7).mean().shift(1)
+    df_tuning["saldo_ema_7"] = df_tuning["saldo"].ewm(span=7).mean().shift(1)
     df_tuning["saldo_ema_30"] = df_tuning["saldo"].ewm(span=30).mean().shift(1)
 
     # 3.5 Shocks / volatilidad
@@ -197,7 +198,7 @@ def build_features_from_saldo(df_raw: pd.DataFrame) -> pd.DataFrame:
         .astype(int)
     )
 
-    df_tuning["cum_7"]  = df_tuning["diff"].rolling(7).sum().shift(1)
+    df_tuning["cum_7"] = df_tuning["diff"].rolling(7).sum().shift(1)
     df_tuning["cum_14"] = df_tuning["diff"].rolling(14).sum().shift(1)
     df_tuning["cum_30"] = df_tuning["diff"].rolling(30).sum().shift(1)
 
@@ -219,10 +220,13 @@ def build_features_from_saldo(df_raw: pd.DataFrame) -> pd.DataFrame:
     return df_tuning
 
 
-
 class DataTransformation:
-    def __init__(self):
-        self.config = DataTransformationConfig()
+    def __init__(self, config: Optional[DataTransformationConfig] = None) -> None:
+        """
+        Si no se pasa config, usa la configuración por defecto.
+        Esto permite que los tests usen rutas temporales sin pisar artifacts reales.
+        """
+        self.config = config or DataTransformationConfig()
 
     def initiate_data_transformation(self):
         """
@@ -285,7 +289,10 @@ class DataTransformation:
             y_test = y.iloc[train_size + val_size :].copy()
 
             logging.info(
-                f"Splits -> X_train: {X_train.shape}, X_val: {X_val.shape}, X_test: {X_test.shape}"
+                f"Splits -> "
+                f"X_train: {X_train.shape}, "
+                f"X_val: {X_val.shape}, "
+                f"X_test: {X_test.shape}"
             )
 
             # =========================
@@ -302,12 +309,11 @@ class DataTransformation:
             df_val_out.to_csv(self.config.val_output_path, index=False)
             df_test_out.to_csv(self.config.test_output_path, index=False)
 
-            logging.info("Datasets transformados guardados en artifacts/data_transformation")
+            logging.info("Datasets transformados guardados")
 
             # Guardamos lista de features para reuso
-            with open(self.config.feature_cols_path, "w") as f:
-                for col in feature_cols:
-                    f.write(col + "\n")
+            with open(self.config.feature_cols_path, "w", encoding="utf-8") as f:
+                json.dump(feature_cols, f, ensure_ascii=False, indent=2)
 
             logging.info("feature_cols guardado correctamente.")
 

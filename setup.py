@@ -25,7 +25,7 @@ setup(
     version="0.0.1",
     author="bryanOsmar07",
     author_email="bryanosmar07@gmail.com",
-    description="Forecasting de variaciones diarias de saldos mediante modelos clásicos y ML.",
+    description="Forecasting de variaciones diarias de saldos mediante ML.",
     url="https://github.com/bryanOsmar07/04_TimeSeries_DailyBalanceForecasting",
     packages=find_packages(),
     install_requires=get_requirements("requirements.txt"),

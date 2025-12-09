@@ -1,25 +1,12 @@
 # src/pipelines/training_pipeline.py
 
 import sys
-import logging
 
+from src.components.data_ingestion import DataIngestion
+from src.components.data_transformation import DataTransformation
+from src.components.model_trainer import ModelTrainer
 from src.exception import CustomException
 from src.logger import logging
-
-from src.components.data_ingestion import (
-    DataIngestion,
-    DataIngestionConfig
-)
-
-from src.components.data_transformation import (
-    DataTransformation,
-    DataTransformationConfig
-)
-
-from src.components.model_trainer import (
-    ModelTrainer,
-    ModelTrainerConfig
-)
 
 
 def run_training_pipeline():
@@ -29,7 +16,6 @@ def run_training_pipeline():
     2. Data Transformation
     3. Model Training
     """
-
     try:
         logging.info("====== Iniciando Training Pipeline ======")
 
@@ -38,43 +24,63 @@ def run_training_pipeline():
         # =====================================================
         logging.info("Paso 1: Data Ingestion...")
 
-        ingestion = DataIngestion(config=DataIngestionConfig())
+        ingestion = DataIngestion()
         train_path, val_path, test_path = ingestion.initiate_data_ingestion()
 
-        logging.info(f"Archivos generados -> {train_path}, {val_path}, {test_path}")
+        logging.info(
+            "Archivos generados -> %s, %s, %s",
+            train_path,
+            val_path,
+            test_path,
+        )
 
         # =====================================================
         # 2) DATA TRANSFORMATION
         # =====================================================
         logging.info("Paso 2: Data Transformation...")
 
-        transformer = DataTransformation(config=DataTransformationConfig())
+        transformer = DataTransformation()
         (
-            X_train_path,
-            y_train_path,
-            X_val_path,
-            y_val_path,
-            X_test_path,
-            y_test_path,
-            feat_path
+            X_train,
+            y_train,
+            X_val,
+            y_val,
+            X_test,
+            y_test,
+            feature_cols,
         ) = transformer.initiate_data_transformation()
 
-        logging.info("Transformación completada. Archivos creados correctamente.")
+        logging.info("Transformación completada. Arrays generados correctamente.")
 
         # =====================================================
         # 3) MODEL TRAINING
         # =====================================================
         logging.info("Paso 3: Model Training...")
 
-        trainer = ModelTrainer(config=ModelTrainerConfig())
-        metrics = trainer.initiate_model_trainer()
+        trainer = ModelTrainer()
+        metrics = trainer.initiate_model_trainer(
+            X_train,
+            y_train,
+            X_val,
+            y_val,
+            X_test,
+            y_test,
+            feature_cols,
+        )
 
         logging.info("Entrenamiento completado correctamente.")
-        logging.info(f"Métricas finales: {metrics}")
+        logging.info("Métricas finales: %s", metrics)
 
         logging.info("====== Training Pipeline Finalizado ======")
         return metrics
 
     except Exception as e:
         logging.error("Error durante la ejecución del pipeline", exc_info=True)
+        raise CustomException(e, sys)
+
+
+if __name__ == "__main__":
+    try:
+        run_training_pipeline()
+    except Exception as e:
         raise CustomException(e, sys)

@@ -8,6 +8,7 @@ import pandas as pd
 
 from src.exception import CustomException
 from src.logger import logging
+from typing import Optional
 
 
 @dataclass
@@ -20,10 +21,10 @@ class DataIngestionConfig:
 
     # Carpeta de artifacts
     artifacts_dir: str = os.path.join("artifacts", "data_ingestion")
-    
+
     # Archivo crudo (copia del .csv original)
     raw_data_path: str = os.path.join("artifacts", "data_ingestion", "raw.csv")
-    
+
     # Splits temporales
     train_data_path: str = os.path.join("artifacts", "data_ingestion", "train.csv")
     val_data_path: str = os.path.join("artifacts", "data_ingestion", "val.csv")
@@ -38,8 +39,12 @@ class DataIngestion:
     - Guarda raw, train, val y test en la carpeta artifacts
     """
 
-    def __init__(self):
-        self.config = DataIngestionConfig()
+    def __init__(self, config: Optional[DataIngestionConfig] = None) -> None:
+        """
+        Si no se pasa config, usa la configuración por defecto.
+        Esto permite que los tests usen rutas temporales sin pisar artifacts reales.
+        """
+        self.config = config or DataIngestionConfig()
 
     def initiate_data_ingestion(self):
         """
@@ -124,40 +129,8 @@ class DataIngestion:
             raise CustomException(e, sys)
 
 
-
-from src.components.data_ingestion import DataIngestion
-from src.components.data_transformation import DataTransformation
-from src.components.model_trainer import ModelTrainer
-
-
 if __name__ == "__main__":
     ingestion = DataIngestion()
     # Probar el data_ingestion
     train_path, val_path, test_path = ingestion.initiate_data_ingestion()
     print(train_path, val_path, test_path)
-
-    # 2. Transformación
-    transformer = DataTransformation()
-    (
-        X_train, y_train,
-        X_val,   y_val,
-        X_test,  y_test,
-        feature_cols,
-    ) = transformer.initiate_data_transformation()
-
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print("N° features:", len(feature_cols))
-
-    # 3) Entrenamiento del modelo
-    trainer = ModelTrainer()
-    metrics = trainer.initiate_model_trainer(
-        X_train=X_train,
-        y_train=y_train,
-        X_val=X_val,
-        y_val=y_val,
-        X_test=X_test,
-        y_test=y_test,
-        feature_cols=feature_cols,
-    )
-
-    print(metrics)

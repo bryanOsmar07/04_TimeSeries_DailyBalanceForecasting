@@ -1,8 +1,9 @@
 import os
-import pandas as pd
+
 import matplotlib.pyplot as plt
-import streamlit as st
+import pandas as pd
 import plotly.graph_objects as go
+import streamlit as st
 
 from src.pipeline.forecast_pipeline import run_forecast_pipeline
 
@@ -66,7 +67,11 @@ def load_feature_importances(
     return df
 
 
-def plot_hist_vs_forecast_plotly(df_raw: pd.DataFrame, df_forecast: pd.DataFrame, n_hist: int = 90):
+def plot_hist_vs_forecast_plotly(
+    df_raw: pd.DataFrame,
+    df_forecast: pd.DataFrame,
+    n_hist: int = 90,
+) -> None:
     """
     Gráfico interactivo con Plotly.
     - Últimos n_hist días reales
@@ -224,8 +229,8 @@ def main():
     st.title("📈 Forecast de Saldos Diarios – CatBoost")
     st.markdown(
         """
-Este dashboard utiliza un modelo **CatBoost** entrenado sobre una serie temporal de saldos diarios
-para pronosticar los próximos días, apoyado en:
+Este dashboard utiliza un modelo **CatBoost** entrenado sobre una serie temporal
+de saldos diarios para pronosticar los próximos días, apoyado en:
 
 - Features de calendario (día, mes, día de la semana, fin de mes, etc.)
 - Flags bancarios (paydays, CTS, gratificación, utilidades, feriados)
@@ -288,8 +293,8 @@ para pronosticar los próximos días, apoyado en:
             # Gráfico
             fig = plot_hist_vs_forecast(df_raw, df_forecast, n_hist=n_hist)
             st.pyplot(fig)
-            #fig = plot_hist_vs_forecast_plotly(df_raw, df_forecast, n_hist=n_hist)
-            #st.plotly_chart(fig, use_container_width=True)
+            # fig = plot_hist_vs_forecast_plotly(df_raw, df_forecast, n_hist=n_hist)
+            # st.plotly_chart(fig, use_container_width=True)
 
             # Tabla
             st.markdown("### 📄 Detalle del forecast")

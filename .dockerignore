@@ -1,0 +1,45 @@
+# Entornos virtuales
+venv/
+.env/
+*.env
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Git
+.git/
+.gitignore
+
+# Test cache
+pytest_cache/
+.pytest_cache/
+.coverage
+
+# Logs
+*.log
+
+# Notebooks y outputs
+notebooks/
+*.ipynb
+
+# Artifacts dinámicos (NO deben ir dentro de Docker)
+artifacts/
+!artifacts/README.md      # (si deseas mantener una referencia vacía)
+
+# Datos locales
+data/
+!data/README.md           # Mantener estructura vacía si quieres
+
+# Modelos entrenados (si los guardas fuera de artifacts/)
+*.pkl
+
+# Carpeta de Streamlit local
+.streamlit/
+
+# Cachés de herramientas
+.mypy_cache/
+.ruff_cache/
