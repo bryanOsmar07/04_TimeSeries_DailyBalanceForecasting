@@ -8,7 +8,8 @@ from typing import Any
 from src.exception import CustomException
 from src.logger import logger
 
-def save_object(file_path: str, obj):
+
+def save_object(file_path: str, obj: Any) -> None:
     """
     Guarda cualquier objeto serializable en el path indicado usando pickle.
     - Crea los directorios si no existen
@@ -28,7 +29,7 @@ def save_object(file_path: str, obj):
         raise CustomException(e, sys)
 
 
-def load_object(file_path: str):
+def load_object(file_path: str) -> Any:
     """
     Carga un objeto pickle desde el path especificado.
     """

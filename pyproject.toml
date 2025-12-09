@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+exclude = '''
+(
+  /venv
+  | /artifacts
+  | /notebooks
+  | /__pycache__
+)
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+skip = ["venv", "artifacts", "notebooks", "__pycache__"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = ["venv", "artifacts", "notebooks", "__pycache__"]

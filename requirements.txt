@@ -1,12 +1,13 @@
 # ===== Core =====
-numpy>=1.22
+numpy<2.0
 pandas>=1.5.0
 scikit-learn>=1.0
 
 # ===== Time Series =====
 statsmodels<=0.14
-pmdarima
-prophet<=1.1.5
+pmdarima==2.0.4
+prophet==1.1.5
+cmdstanpy==1.2.2
 
 # ===== Machine Learning =====
 xgboost>=1.7

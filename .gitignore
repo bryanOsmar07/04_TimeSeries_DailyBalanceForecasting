@@ -261,3 +261,58 @@ mlartifacts/
 # Configuración de Jupyter
 .ipynb_checkpoints/
 jupyter_cache/
+
+
+# ==========================================
+# PROYECTO ML - REGLAS ESPECÍFICAS
+# ==========================================
+
+# No subir artefactos generados
+artifacts/
+**/artifacts/
+
+# No subir datasets locales
+data/
+data/raw/
+data/interim/
+data/processed/
+
+# No subir notebooks (temporalmente)
+notebooks/
+**/*.ipynb_checkpoints/
+
+# Modelos entrenados y binarios
+models/
+*.pkl
+*.joblib
+*.sav
+
+# Logs
+logs/
+*.log
+
+# Streamlit cache
+.streamlit/
+**/.streamlit/
+
+# Docker outputs
+docker_out/
+*.tar
+*.img
+
+# Archivos temporales
+*.cache
+*.tmp
+test_outputs/
+outputs/
+
+# Credenciales o configuraciones locales
+*.env
+*.env.*
+.env_local
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+ENV/
