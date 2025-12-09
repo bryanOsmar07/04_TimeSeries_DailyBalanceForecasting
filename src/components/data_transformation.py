@@ -1,15 +1,15 @@
 # src/components/data_transformation.py
 
+import json
 import os
 import sys
 from dataclasses import dataclass
+from typing import Optional
 
 import pandas as pd
-import json
 
 from src.exception import CustomException
 from src.logger import logging
-from typing import Optional
 
 
 @dataclass
@@ -19,27 +19,16 @@ class DataTransformationConfig:
     - Lee raw.csv generado por DataIngestion
     - Genera features y splits train/val/test
     """
-    raw_data_path: str = os.path.join(
-        "artifacts", "data_ingestion", "raw.csv"
-    )
 
-    transformed_dir: str = os.path.join(
-        "artifacts", "data_transformation"
-    )
+    raw_data_path: str = os.path.join("artifacts", "data_ingestion", "raw.csv")
 
-    train_output_path: str = os.path.join(
-        transformed_dir, "train_transformed.csv"
-    )
-    val_output_path: str = os.path.join(
-        transformed_dir, "val_transformed.csv"
-    )
-    test_output_path: str = os.path.join(
-        transformed_dir, "test_transformed.csv"
-    )
+    transformed_dir: str = os.path.join("artifacts", "data_transformation")
 
-    feature_cols_path: str = os.path.join(
-        transformed_dir, "feature_cols.json"
-    )
+    train_output_path: str = os.path.join(transformed_dir, "train_transformed.csv")
+    val_output_path: str = os.path.join(transformed_dir, "val_transformed.csv")
+    test_output_path: str = os.path.join(transformed_dir, "test_transformed.csv")
+
+    feature_cols_path: str = os.path.join(transformed_dir, "feature_cols.json")
 
 
 def build_features_from_saldo(df_raw: pd.DataFrame) -> pd.DataFrame:
@@ -192,10 +181,7 @@ def build_features_from_saldo(df_raw: pd.DataFrame) -> pd.DataFrame:
     roll_std_30 = df_tuning["diff"].rolling(30).std()
 
     df_tuning["is_shock"] = (
-        (df_tuning["diff"].abs() > roll_std_30 * 2)
-        .shift(1)
-        .fillna(0)
-        .astype(int)
+        (df_tuning["diff"].abs() > roll_std_30 * 2).shift(1).fillna(0).astype(int)
     )
 
     df_tuning["cum_7"] = df_tuning["diff"].rolling(7).sum().shift(1)
@@ -205,9 +191,7 @@ def build_features_from_saldo(df_raw: pd.DataFrame) -> pd.DataFrame:
     df_tuning["diff_abs"] = df_tuning["diff"].abs()
 
     df_tuning["repeat_shock"] = (
-        (df_tuning["diff_abs"].shift(1) > roll_std_30)
-        .fillna(0)
-        .astype(int)
+        (df_tuning["diff_abs"].shift(1) > roll_std_30).fillna(0).astype(int)
     )
 
     # 3.6 One-hot de día de semana
@@ -265,9 +249,7 @@ class DataTransformation:
                 "target_diff_tplus1",
             ]
 
-            feature_cols = [
-                c for c in df_feat.columns if c not in excluded_cols
-            ]
+            feature_cols = [c for c in df_feat.columns if c not in excluded_cols]
 
             X = df_feat[feature_cols]
             y = df_feat[target_col]

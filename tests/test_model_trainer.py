@@ -1,7 +1,8 @@
 # tests/test_model_trainer.py
 
-import numpy as np
 from pathlib import Path
+
+import numpy as np
 
 from src.components.model_trainer import ModelTrainer, ModelTrainerConfig
 

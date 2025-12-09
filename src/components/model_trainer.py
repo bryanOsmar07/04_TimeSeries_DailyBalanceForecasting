@@ -9,11 +9,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from catboost import CatBoostRegressor
-from sklearn.metrics import (
-    mean_absolute_error,
-    r2_score,
-    root_mean_squared_error,
-)
+from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
 
 from src.exception import CustomException
 from src.logger import logging
@@ -24,22 +20,17 @@ class ModelTrainerConfig:
     """
     Rutas de salida para el modelo entrenado y sus artefactos.
     """
+
     artifacts_dir: str = os.path.join("artifacts", "model_trainer")
 
-    model_path: str = os.path.join(
-        artifacts_dir, "catboost_saldo_model.pkl"
-    )
-    metrics_path: str = os.path.join(
-        artifacts_dir, "metrics_catboost_saldo.csv"
-    )
+    model_path: str = os.path.join(artifacts_dir, "catboost_saldo_model.pkl")
+    metrics_path: str = os.path.join(artifacts_dir, "metrics_catboost_saldo.csv")
     feature_importance_path: str = os.path.join(
         artifacts_dir, "feature_importances_catboost_saldo.csv"
     )
 
 
-def _compute_metrics(
-    y_true: np.ndarray, y_pred: np.ndarray
-) -> Dict[str, float]:
+def _compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
     """
     Calcula métricas de regresión básicas.
     """
@@ -49,9 +40,7 @@ def _compute_metrics(
 
     # Evitamos divisiones por cero en MAPE
     with np.errstate(divide="ignore", invalid="ignore"):
-        mape = np.mean(
-            np.abs((y_true - y_pred) / y_true)
-        ) * 100.0
+        mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100.0
     if np.isinf(mape) or np.isnan(mape):
         mape = np.nan
 
@@ -141,9 +130,7 @@ class ModelTrainer:
             df_metrics["modelo"] = "CatBoost tuned – saldo"
 
             df_metrics.to_csv(self.config.metrics_path, index=True)
-            logging.info(
-                "Métricas guardadas en %s", self.config.metrics_path
-            )
+            logging.info("Métricas guardadas en %s", self.config.metrics_path)
 
             # ============================
             # 3) Feature importance
@@ -158,9 +145,7 @@ class ModelTrainer:
                 }
             ).sort_values("importance", ascending=False)
 
-            df_importance.to_csv(
-                self.config.feature_importance_path, index=False
-            )
+            df_importance.to_csv(self.config.feature_importance_path, index=False)
             logging.info(
                 "Importancias de variables guardadas en %s",
                 self.config.feature_importance_path,
@@ -178,9 +163,7 @@ class ModelTrainer:
             final_model.fit(X_train_full, y_train_full)
 
             joblib.dump(final_model, self.config.model_path)
-            logging.info(
-                "Modelo final guardado en %s", self.config.model_path
-            )
+            logging.info("Modelo final guardado en %s", self.config.model_path)
 
             # ============================
             # 5) Devolver resumen

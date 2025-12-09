@@ -3,12 +3,12 @@
 import os
 import sys
 from dataclasses import dataclass
+from typing import Optional
 
 import pandas as pd
 
 from src.exception import CustomException
 from src.logger import logging
-from typing import Optional
 
 
 @dataclass
@@ -16,6 +16,7 @@ class DataIngestionConfig:
     """
     Rutas por defecto de los archivos generados en la etapa de ingestión.
     """
+
     # Archivo de origen
     source_csv_path: str = os.path.join("data", "raw", "data_fake_serie.csv")
 
@@ -76,8 +77,7 @@ class DataIngestion:
                 df["load_date"] = pd.to_datetime(df["load_date"])
             else:
                 raise CustomException(
-                    "La columna 'load_date' no existe en el dataset.",
-                    sys
+                    "La columna 'load_date' no existe en el dataset.", sys
                 )
 
             # Orden temporal
@@ -99,8 +99,8 @@ class DataIngestion:
             val_size = int(n * 0.15)
 
             train_df = df.iloc[:train_size].copy()
-            val_df = df.iloc[train_size: train_size + val_size].copy()
-            test_df = df.iloc[train_size + val_size:].copy()
+            val_df = df.iloc[train_size : train_size + val_size].copy()
+            test_df = df.iloc[train_size + val_size :].copy()
 
             logging.info(
                 "Splits generados - "
