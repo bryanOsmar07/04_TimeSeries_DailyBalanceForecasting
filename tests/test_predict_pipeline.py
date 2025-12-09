@@ -41,10 +41,12 @@ def test_predict_pipeline(tmp_path, monkeypatch):
     dates = pd.date_range("2024-01-01", periods=n_days_hist, freq="D")
     saldo = np.linspace(1000, 2000, n_days_hist)  # tendencia suave
 
-    df_hist = pd.DataFrame({
-        "load_date": dates,
-        "saldo": saldo,
-    })
+    df_hist = pd.DataFrame(
+        {
+            "load_date": dates,
+            "saldo": saldo,
+        }
+    )
 
     # Lo guardamos en un CSV temporal
     raw_csv_path = tmp_path / "raw_predict.csv"

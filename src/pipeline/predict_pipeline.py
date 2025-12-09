@@ -20,15 +20,14 @@ class PredictConfig:
     Configuración de rutas para el pipeline de predicción.
     Ajusta estas rutas según tu proyecto.
     """
+
     model_path: str = os.path.join(
         "artifacts", "model_trainer", "catboost_saldo_model.pkl"
     )
     feature_cols_path: str = os.path.join(
         "artifacts", "data_transformation", "feature_cols.json"
     )
-    raw_data_path: str = os.path.join(
-        "data", "raw", "data_fake_serie.csv"
-    )
+    raw_data_path: str = os.path.join("data", "raw", "data_fake_serie.csv")
     forecast_days: int = 15
     forecast_output_path: str = os.path.join(
         "artifacts", "forecast", "forecast_15_days.csv"

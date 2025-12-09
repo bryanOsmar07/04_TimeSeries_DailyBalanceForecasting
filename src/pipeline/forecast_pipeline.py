@@ -113,7 +113,7 @@ def run_forecast_pipeline(n_days: int = 15) -> str:
             logging.info(
                 "feature_cols cargado desde %s con %d columnas.",
                 FEATURE_COLS_PATH,
-                len(feature_cols)
+                len(feature_cols),
             )
 
         else:
@@ -145,9 +145,7 @@ def run_forecast_pipeline(n_days: int = 15) -> str:
         # 3) Cargar modelo CatBoost
         # ============================
         if not os.path.exists(MODEL_PATH):
-            raise FileNotFoundError(
-                f"No se encontró el modelo en {MODEL_PATH}."
-            )
+            raise FileNotFoundError(f"No se encontró el modelo en {MODEL_PATH}.")
 
         model = joblib.load(MODEL_PATH)
         logging.info("Modelo CatBoost cargado desde %s", MODEL_PATH)
